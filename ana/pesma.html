@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Za Anu 🎀 — Srećan rođendan</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts with Latin-Extended support for Serbian diacritics (č, ć, ž, š, đ) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tone.js for gentle optional chime sounds (no external audio URLs needed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#FFFDF9',
+            blush: '#F8D7E0',
+            blushSoft: '#FDF2F5',
+            dustyRose: '#D88C9A',
+            deepRose: '#B86575',
+            goldAccent: '#D4AF37',
+            plumText: '#3D2C2E',
+            plumMuted: '#6D5458'
+          },
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            serifBody: ['"Lora"', 'Georgia', 'serif'],
+            sansUi: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom ambient animations & envelope physics */
+    html {
+      scroll-behavior: smooth;
+      background-color: #FFFDF9;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 15%, #FDF0F4 0%, #FFFDF9 50%, #FBE8EE 100%);
+      color: #3D2C2E;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Subtle paper grain texture overlay */
+    .paper-texture {
+      background-image: radial-gradient(rgba(216, 140, 154, 0.08) 1px, transparent 0);
+      background-size: 22px 22px;
+    }
+
+    /* Pulse ring on the main CTA button */
+    @keyframes gentlePulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 28px -6px rgba(216, 140, 154, 0.55), 0 0 0 0 rgba(216, 140, 154, 0.45);
+      }
+      50% {
+        transform: scale(1.025);
+        box-shadow: 0 14px 34px -6px rgba(216, 140, 154, 0.7), 0 0 0 10px rgba(216, 140, 154, 0);
+      }
+    }
+
+    .btn-pulse {
+      animation: gentlePulse 2.8s infinite ease-in-out;
+    }
+
+    /* Floating envelope idle motion */
+    @keyframes floatSlow {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-7px) rotate(0.6deg);
+      }
+    }
+
+    .envelope-float {
+      animation: floatSlow 4.5s ease-in-out infinite;
+    }
+
+    /* Envelope flap 3D opening */
+    .envelope-wrapper {
+      perspective: 1100px;
+    }
+
+    .envelope-flap {
+      transform-origin: top center;
+      transition: transform 0.85s cubic-bezier(0.34, 1.35, 0.64, 1);
+      backface-visibility: visible;
+    }
+
+    .envelope-opened .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    .wax-seal {
+      transition: transform 0.5s ease, opacity 0.4s ease;
+    }
+
+    .envelope-opened .wax-seal {
+      transform: scale(0.5) rotate(-25deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Paragraph reveal animation */
+    @keyframes paragraphReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .paragraph-enter {
+      animation: paragraphReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Golden shimmer border for the final birthday wish */
+    .finale-card {
+      background: linear-gradient(145deg, #FFFDF9 0%, #FDF0F4 60%, #F9E0E8 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.55);
+      box-shadow: 0 18px 45px -12px rgba(216, 140, 154, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* Ambient floating particles */
+    @keyframes driftUp {
+      0% {
+        transform: translateY(105vh) translateX(0px) rotate(0deg);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.75;
+      }
+      85% {
+        opacity: 0.65;
+      }
+      100% {
+        transform: translateY(-15vh) translateX(24px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .ambient-particle {
+      position: fixed;
+      top: 0;
+      pointer-events: none;
+      z-index: 0;
+      animation: driftUp linear infinite;
+    }
+
+    /* Burst particle animation for hugs & envelope opening */
+    @keyframes burstFly {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.5) rotate(0deg);
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(1.25) rotate(var(--rot));
+      }
+    }
+
+    .burst-item {
+      position: fixed;
+      pointer-events: none;
+      z-index: 50;
+      animation: burstFly var(--dur, 1.8s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen paper-texture font-serifBody antialiased selection:bg-blush selection:text-plumText">
+
+  <!-- Ambient Floating Sparkles & Petals Container -->
+  <div id="ambient-layer" aria-hidden="true"></div>
+
+  <!-- Interactive Particle Burst Layer -->
+  <div id="burst-layer" aria-hidden="true"></div>
+
+  <!-- Top Subtle Sound & Progress Bar (Visible when reading) -->
+  <header id="reading-header" class="fixed top-0 left-0 right-0 z-30 opacity-0 pointer-events-none transition-opacity duration-500 bg-cream/85 backdrop-blur-md border-b border-blush/70">
+    <div class="max-w-lg mx-auto px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🎀</span>
+        <span class="font-display italic text-lg font-semibold text-plumText">Pismo za Anu</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Step Indicator -->
+        <span id="progress-label" class="font-sansUi text-xs font-medium text-plumMuted bg-blushSoft px-2.5 py-1 rounded-full border border-blush">
+          1 / 7
+        </span>
+
+        <!-- Sound Toggle Button -->
+        <button
+          id="sound-toggle"
+          type="button"
+          aria-label="Uključi ili isključi nežan zvuk"
+          class="w-9 h-9 rounded-full bg-blushSoft border border-blush flex items-center justify-center text-deepRose hover:bg-blush/60 active:scale-95 transition"
+          title="Nežan zvuk"
+        >
+          <span id="sound-icon" class="text-sm">🔔</span>
+        </button>
+      </div>
+    </div>
+    <!-- Thin Golden-Rose Progress Bar -->
+    <div class="w-full h-1 bg-blush/40">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-dustyRose via-deepRose to-goldAccent transition-all duration-500 ease-out" style="width: 14.28%;"></div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-10 sm:py-14">
+
+    <!-- =========================================================
+         SCREEN 1: CLOSED ENVELOPE / GIFT INTRO
+    ========================================================== -->
+    <section id="intro-screen" class="w-full max-w-md mx-auto flex flex-col items-center text-center transition-all duration-700">
+
+      <!-- Small Top Subtitle -->
+      <p class="font-sansUi uppercase tracking-[0.22em] text-[11px] font-semibold text-deepRose/90 mb-3 bg-white/75 px-3.5 py-1.5 rounded-full border border-blush shadow-sm">
+        Posebna rođendanska poruka
+      </p>
+
+      <!-- Main Heading -->
+      <h1 class="font-display text-4xl sm:text-5xl font-semibold text-plumText tracking-tight mb-2">
+        Za Anu <span class="inline-block animate-bounce">🎀</span>
+      </h1>
+      <p class="font-serifBody italic text-sm sm:text-base text-plumMuted mb-8 max-w-xs">
+        Jedno malo pismo napisano od srca, samo za tebe...
+      </p>
+
+      <!-- Interactive Sealed Envelope Card -->
+      <div id="envelope-box" class="envelope-wrapper envelope-float w-full max-w-[330px] sm:max-w-[360px] mb-9 cursor-pointer select-none" role="button" tabindex="0" aria-label="Otvori rođendansko pismo za Anu">
+        <div class="relative w-full aspect-[4/3] rounded-2xl shadow-[0_20px_50px_-12px_rgba(184,101,117,0.35)] border border-dustyRose/35 bg-gradient-to-b from-[#FDF4F6] to-[#F7DCE4] overflow-hidden">
+
+          <!-- Inner Letter Peek -->
+          <div class="absolute inset-x-4 top-3 bottom-3 bg-cream rounded-xl shadow-inner border border-goldAccent/30 flex flex-col items-center justify-center p-4">
+            <span class="text-xs uppercase tracking-widest text-goldAccent font-sansUi font-semibold mb-1">Srećan rođendan</span>
+            <p class="font-display italic text-xl text-plumText">Miko moj, kumi moj 🩷</p>
+          </div>
+
+          <!-- Left & Right Envelope Folds (SVG for crisp geometry) -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 400 300" preserveAspectRatio="none">
+            <!-- Left flap -->
+            <polygon points="0,0 205,155 0,300" fill="#F9E1E8" stroke="#E5B6C3" stroke-width="1" />
+            <!-- Right flap -->
+            <polygon points="400,0 195,155 400,300" fill="#F7DCE4" stroke="#E5B6C3" stroke-width="1" />
+            <!-- Bottom flap -->
+            <polygon points="0,300 200,140 400,300" fill="#FDF2F5" stroke="#DFACB9" stroke-width="1.2" />
+          </svg>
+
+          <!-- Top Animated Flap -->
+          <div class="envelope-flap absolute top-0 left-0 right-0 h-[56%] z-20 pointer-events-none">
+            <svg class="w-full h-full drop-shadow-md" viewBox="0 0 400 170" preserveAspectRatio="none">
+              <polygon points="0,0 400,0 200,165" fill="#F4CED9" stroke="#D88C9A" stroke-width="1.2" />
+            </svg>
+          </div>
+
+          <!-- Gold & Rose Wax Seal in Center -->
+          <div class="wax-seal absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+            <div class="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full bg-gradient-to-br from-[#E4C35A] via-[#D4AF37] to-[#B38E22] p-1 shadow-[0_8px_20px_rgba(179,142,34,0.45)] flex items-center justify-center">
+              <div class="w-full h-full rounded-full border border-cream/60 flex flex-col items-center justify-center bg-gradient-to-tl from-[#C59F2B] to-[#E9CC6B]">
+                <span class="font-display font-bold text-cream text-2xl leading-none drop-shadow-sm">A</span>
+                <span class="text-[10px] leading-none mt-0.5">🩷</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decorative Corner Sparkle -->
+          <div class="absolute bottom-3 right-4 z-20 font-display italic text-sm text-deepRose/80 pointer-events-none">
+            Za tebe ✨
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Call-to-Action Button -->
+      <button
+        id="open-letter-btn"
+        type="button"
+        class="btn-pulse w-full max-w-[290px] py-4 px-7 rounded-full bg-gradient-to-r from-dustyRose via-deepRose to-dustyRose text-white font-sansUi font-semibold text-base tracking-wide shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2.5 cursor-pointer"
+      >
+        <span>Otvori pismo</span>
+        <span class="text-lg">🩷</span>
+      </button>
+
+      <p class="mt-4 font-sansUi text-xs text-plumMuted/80">
+        Dodirni kovertu ili dugme da započneš čitanje
+      </p>
+    </section>
+
+    <!-- =========================================================
+         SCREEN 2: PROGRESSIVE LETTER READING EXPERIENCE
+    ========================================================== -->
+    <section id="letter-screen" class="hidden w-full max-w-lg mx-auto pt-12 pb-16">
+
+      <!-- Letter Paper Container -->
+      <article class="relative bg-cream/95 backdrop-blur-sm rounded-3xl border border-blush shadow-[0_20px_60px_-15px_rgba(184,101,117,0.22)] px-6 py-8 sm:px-10 sm:py-11">
+
+        <!-- Decorative Top Gold & Rose Divider -->
+        <div class="flex flex-col items-center text-center mb-7">
+          <div class="inline-flex items-center gap-2 text-goldAccent text-xs tracking-[0.25em] uppercase font-sansUi font-semibold mb-2">
+            <span>✦</span>
+            <span>Srećan rođendan</span>
+            <span>✦</span>
+          </div>
+          <h2 class="font-display text-3xl sm:text-4xl font-semibold text-plumText">
+            Kumi moj 🎀
+          </h2>
+          <div class="w-20 h-[1.5px] bg-gradient-to-r from-transparent via-goldAccent to-transparent mt-3"></div>
+        </div>
+
+        <!-- Container where paragraphs appear step-by-step -->
+        <div id="paragraphs-container" class="space-y-6 text-[16.5px] sm:text-[17.5px] leading-[1.82] text-plumText">
+          <!-- Paragraphs injected dynamically so every tap feels intimate & paced -->
+        </div>
+
+        <!-- Interactive Next-Step Controls -->
+        <div id="next-controls" class="mt-9 pt-5 border-t border-blush/70 flex flex-col items-center">
+          <button
+            id="next-paragraph-btn"
+            type="button"
+            class="w-full sm:w-auto min-w-[230px] py-3.5 px-7 rounded-full bg-blushSoft hover:bg-blush/75 text-deepRose font-sansUi font-semibold text-sm sm:text-base border border-dustyRose/45 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span id="next-btn-text">Nastavi dalje</span>
+            <span id="next-btn-icon" class="text-base transition-transform duration-300">↓</span>
+          </button>
+          <span id="tap-hint" class="mt-2.5 font-sansUi text-[11.5px] text-plumMuted/75">
+            Dodirni za sledeći deo pisma
+          </span>
+        </div>
+
+        <!-- Final Celebration Actions (Shown after all 7 paragraphs are revealed) -->
+        <div id="finale-actions" class="hidden mt-9 pt-6 border-t border-goldAccent/35 flex flex-col items-center text-center paragraph-enter">
+          <p class="font-display italic text-xl text-deepRose mb-4">
+            Volim te beskrajno! 🩷
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+            <!-- Send Hug Button -->
+            <button
+              id="hug-btn"
+              type="button"
+              class="btn-pulse w-full sm:w-auto py-3.5 px-7 rounded-full bg-gradient-to-r from-dustyRose via-deepRose to-dustyRose text-white font-sansUi font-semibold text-sm sm:text-base shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Pošalji zagrljaj</span>
+              <span class="text-lg">🫂</span>
+            </button>
+
+            <!-- Replay Button -->
+            <button
+              id="replay-btn"
+              type="button"
+              class="w-full sm:w-auto py-3 px-5 rounded-full bg-white hover:bg-blushSoft text-plumMuted font-sansUi font-medium text-xs sm:text-sm border border-blush transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Pročitaj ponovo</span>
+              <span>↺</span>
+            </button>
+          </div>
+
+          <p id="hug-counter-msg" class="mt-3 font-sansUi text-xs text-deepRose font-medium opacity-0 transition-opacity duration-300">
+            Poslat je topli zagrljaj za Anu! 🫂🎀🩷
+          </p>
+        </div>
+
+      </article>
+    </section>
+
+  </main>
+
+  <script>
+    /**
+     * Exact Serbian birthday letter paragraphs preserved verbatim.
+     */
+    const LETTER_PARAGRAPHS = [
+      "Već sam jednom pokušala da ti kroz reči dočaram sve ono što osećam, da napišem nešto o nama, o našem prijateljstvu, o svim onim trenucima koji su nas dovele do danas. Ali ovog puta ne želim da pišem o nama. Danas želim da pišem samo o tebi.",
+      "O Ani. O osobi koja možda ni sama nije svesna koliko je posebna, koliko lepote nosi u sebi i koliko je dragoceno to što je baš takva kakva jeste. O devojci koja zaslužuje da joj se dešavaju najlepše stvari, ne zato što je život uvek bio lak i ne zato što je sve uvek bilo savršeno.",
+      "Volela bih da sebe ponekad možeš da vidiš onako kako te vide ljudi koji te iskreno vole (ovo uvek kažem jer je stvarno bitno da imamo svest o tome koliko smo posebni dragim ljudima). Da budeš ponosna na svoje srce, na svoju snagu, na sve ono što jesi, ali i na sve ono što si postala. I negde u svemu tome, volela bih da se setiš i one male Ane, koja je nekada imala svoje snove i zamišljala kakva će jednog dana biti. Verujem da bi danas, gledajući te, bila ponosna. Možda ne bi ni mogla da zamisli koliko lepih stvari je čeka i kakva će devojka jednog dana postati.",
+      "Danas već imaš neke od najlepših stvari o kojima se sanja, ljubav, svoj dom, svoje malo carstvo i nekoga sa kim deliš život. I baš zato ti želim još mnogo više od onoga što već imaš. Želim ti da ti se život neprestano širi u lepim pravcima, da nikada ne prestaneš da se raduješ, da imaš razloga da budeš ponosna na sebe i da ti se ostvare čak i one želje koje još uvek čuvaš samo u svojim mislima.",
+      "Želim ti da nikada ne moraš da umanjuješ sebe da bi se uklopila u nečiji svet. Da uvek imaš dovoljno razloga da voliš osobu koju vidiš u ogledalu. Da ti godine donose mudrost, ali da ti nikada ne oduzmu onu dečiju iskrenost, radost i sposobnost da se obraduješ sitnicama.",
+      "I ako bih mogla da ti poželim samo jednu stvar, onda bi to bilo da nikada ne izgubiš osećaj koliko je lepo biti ti. Da jednog dana, kada se osvrneš na sve godine koje su prošle, budeš ponosna ne samo na ono što si ostvarila i sve što si stekla, već pre svega na osobu koja si postala.",
+      "Srećan ti rođendan miko moj, kumi moj. Želim ti život u kojem ćeš imati još bezbroj razloga da budeš srećna, ali i da uvek, čak i u najobičnijim danima, znaš koliko si voljena, koliko vrediš i koliko je ovaj svet lepše mesto jer u njemu postojiš baš ti. 🫂🎀🩷"
+    ];
+
+    // State variables
+    let currentStep = 0;
+    let isOpened = false;
+    let soundEnabled = true;
+    let hugCount = 0;
+    let synth = null;
+
+    // DOM References
+    const ambientLayer = document.getElementById('ambient-layer');
+    const burstLayer = document.getElementById('burst-layer');
+    const introScreen = document.getElementById('intro-screen');
+    const letterScreen = document.getElementById('letter-screen');
+    const envelopeBox = document.getElementById('envelope-box');
+    const openLetterBtn = document.getElementById('open-letter-btn');
+    const readingHeader = document.getElementById('reading-header');
+    const progressLabel = document.getElementById('progress-label');
+    const progressBar = document.getElementById('progress-bar');
+    const paragraphsContainer = document.getElementById('paragraphs-container');
+    const nextControls = document.getElementById('next-controls');
+    const nextParagraphBtn = document.getElementById('next-paragraph-btn');
+    const nextBtnText = document.getElementById('next-btn-text');
+    const nextBtnIcon = document.getElementById('next-btn-icon');
+    const finaleActions = document.getElementById('finale-actions');
+    const hugBtn = document.getElementById('hug-btn');
+    const hugCounterMsg = document.getElementById('hug-counter-msg');
+    const replayBtn = document.getElementById('replay-btn');
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundIcon = document.getElementById('sound-icon');
+
+    /**
+     * Initializes soft ambient floating hearts, ribbons & golden sparkles.
+     */
+    function createAmbientParticles() {
+      const symbols = ['✨', '🌸', '🩷', '🎀', '·'];
+      const count = 16;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.className = 'ambient-particle select-none';
+        el.textContent = symbols[i % symbols.length];
+
+        const leftPos = Math.random() * 100;
+        const duration = 14 + Math.random() * 14;
+        const delay = -(Math.random() * 18);
+        const size = 11 + Math.random() * 10;
+
+        el.style.left = `${leftPos}vw`;
+        el.style.fontSize = `${size}px`;
+        el.style.animationDuration = `${duration}s`;
+        el.style.animationDelay = `${delay}s`;
+        el.style.opacity = '0.5';
+
+        ambientLayer.appendChild(el);
+      }
+    }
+
+    /**
+     * Plays a gentle, warm music-box chime using Tone.js on interaction.
+     */
+    async function playGentleChime(type = 'step') {
+      if (!soundEnabled || typeof Tone === 'undefined') return;
+      try {
+        if (Tone.context.state !== 'running') {
+          await Tone.start();
+        }
+        if (!synth) {
+          synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: 0.04,
+              decay: 0.4,
+              sustain: 0.1,
+              release: 1.4
+            },
+            volume: -14
+          }).toDestination();
+        }
+
+        const now = Tone.now();
+        if (type === 'open') {
+          synth.triggerAttackRelease(['C5', 'E5', 'G5', 'B5'], '4n', now);
+        } else if (type === 'finale') {
+          synth.triggerAttackRelease('C5', '8n', now);
+          synth.triggerAttackRelease('E5', '8n', now + 0.12);
+          synth.triggerAttackRelease('G5', '8n', now + 0.24);
+          synth.triggerAttackRelease(['C6', 'E6'], '2n', now + 0.36);
+        } else if (type === 'hug') {
+          synth.triggerAttackRelease(['F5', 'A5', 'C6'], '4n', now);
+        } else {
+          const notes = ['E5', 'G5', 'A5', 'B5', 'C6', 'D6'];
+          const note = notes[currentStep % notes.length];
+          synth.triggerAttackRelease(note, '8n', now);
+        }
+      } catch (err) {
+        // Gracefully ignore audio restrictions if blocked
+      }
+    }
+
+    /**
+     * Spawns a warm burst of hearts, ribbons, and sparkles from a given screen coordinate.
+     */
+    function triggerParticleBurst(originX, originY, amount = 22) {
+      const emojis = ['🩷', '🎀', '✨', '💖', '🌸', '🫂'];
+      for (let i = 0; i < amount; i++) {
+        const item = document.createElement('span');
+        item.className = 'burst-item select-none';
+        item.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        const angle = (Math.PI * 2 * i) / amount + (Math.random() - 0.5) * 0.5;
+        const distance = 70 + Math.random() * 170;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance - 55;
+        const rot = (Math.random() - 0.5) * 360;
+        const dur = 1.2 + Math.random() * 0.9;
+        const size = 16 + Math.random() * 14;
+
+        item.style.left = `${originX}px`;
+        item.style.top = `${originY}px`;
+        item.style.fontSize = `${size}px`;
+        item.style.setProperty('--tx', `${tx}px`);
+        item.style.setProperty('--ty', `${ty}px`);
+        item.style.setProperty('--rot', `${rot}deg`);
+        item.style.setProperty('--dur', `${dur}s`);
+
+        burstLayer.appendChild(item);
+
+        setTimeout(() => {
+          item.remove();
+        }, dur * 1000 + 50);
+      }
+    }
+
+    /**
+     * Renders the next paragraph smoothly and updates reading progress.
+     */
+    function revealNextParagraph() {
+      if (currentStep >= LETTER_PARAGRAPHS.length) return;
+
+      const index = currentStep;
+      const isLast = index === LETTER_PARAGRAPHS.length - 1;
+
+      const pWrapper = document.createElement('div');
+      pWrapper.className = 'paragraph-enter';
+
+      if (isLast) {
+        // Special highlighted finale card for the birthday wish
+        pWrapper.innerHTML = `
+          <div class="finale-card rounded-2xl p-6 sm:p-7 mt-3 relative overflow-hidden">
+            <div class="flex items-center justify-center gap-2 text-goldAccent text-xs uppercase tracking-[0.2em] font-sansUi font-semibold mb-3">
+              <span>🎀</span>
+              <span>Za tebe, zauvek</span>
+              <span>🎀</span>
+            </div>
+            <p class="font-serifBody font-medium text-plumText text-[17px] sm:text-[18.5px] leading-[1.85] text-center">
+              ${LETTER_PARAGRAPHS[index]}
+            </p>
+          </div>
+        `;
+      } else {
+        // Subtle first-paragraph drop-cap styling for elegance
+        const firstLetterClass = index === 0
+          ? 'first-letter:font-display first-letter:text-4xl first-letter:font-semibold first-letter:text-deepRose first-letter:mr-1 first-letter:float-left first-letter:leading-[0.95]'
+          : '';
+
+        pWrapper.innerHTML = `
+          <p class="${firstLetterClass} text-plumText/95">
+            ${LETTER_PARAGRAPHS[index]}
+          </p>
+        `;
+      }
+
+      paragraphsContainer.appendChild(pWrapper);
+      currentStep++;
+
+      // Update header progress bar & counter
+      const percent = (currentStep / LETTER_PARAGRAPHS.length) * 100;
+      progressBar.style.width = `${percent}%`;
+      progressLabel.textContent = `${currentStep} / ${LETTER_PARAGRAPHS.length}`;
+
+      // Update button text before the final paragraph
+      if (currentStep === LETTER_PARAGRAPHS.length - 1) {
+        nextBtnText.textContent = 'Otvori završnu želju';
+        nextBtnIcon.textContent = '✨';
+        nextParagraphBtn.classList.add('border-goldAccent', 'bg-gradient-to-r', 'from-blushSoft', 'to-[#FCE7EE]');
+      }
+
+      // If final paragraph was just revealed
+      if (isLast) {
+        nextControls.classList.add('hidden');
+        finaleActions.classList.remove('hidden');
+        playGentleChime('finale');
+
+        const rect = pWrapper.getBoundingClientRect();
+        triggerParticleBurst(
+          window.innerWidth / 2,
+          Math.max(180, Math.min(window.innerHeight - 150, rect.top + 80)),
+          32
+        );
+      } else if (currentStep > 1) {
+        playGentleChime('step');
+      }
+
+      // Smoothly scroll newly revealed paragraph into comfortable view on mobile
+      setTimeout(() => {
+        pWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 120);
+    }
+
+    /**
+     * Opens the sealed envelope and transitions gracefully to the letter view.
+     */
+    function openEnvelopeExperience(event) {
+      if (isOpened) return;
+      isOpened = true;
+
+      playGentleChime('open');
+
+      // Trigger envelope flap animation
+      envelopeBox.classList.remove('envelope-float');
+      envelopeBox.classList.add('envelope-opened');
+
+      // Particle burst from the wax seal center
+      const rect = envelopeBox.getBoundingClientRect();
+      const cx = event && event.clientX ? event.clientX : rect.left + rect.width / 2;
+      const cy = event && event.clientY ? event.clientY : rect.top + rect.height / 2;
+      triggerParticleBurst(cx, cy, 26);
+
+      // Transition from Intro Screen to Letter Screen
+      setTimeout(() => {
+        introScreen.style.opacity = '0';
+        introScreen.style.transform = 'translateY(-16px) scale(0.97)';
+
+        setTimeout(() => {
+          introScreen.classList.add('hidden');
+          letterScreen.classList.remove('hidden');
+
+          // Show top reading bar
+          readingHeader.classList.remove('opacity-0', 'pointer-events-none');
+
+          // Reveal first paragraph automatically so she immediately starts reading
+          revealNextParagraph();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 480);
+      }, 680);
+    }
+
+    /**
+     * Resets the card back to the closed envelope so she can experience it again.
+     */
+    function resetExperience() {
+      isOpened = false;
+      currentStep = 0;
+      paragraphsContainer.innerHTML = '';
+
+      // Reset controls
+      nextControls.classList.remove('hidden');
+      finaleActions.classList.add('hidden');
+      nextBtnText.textContent = 'Nastavi dalje';
+      nextBtnIcon.textContent = '↓';
+      nextParagraphBtn.classList.remove('border-goldAccent', 'bg-gradient-to-r', 'from-blushSoft', 'to-[#FCE7EE]');
+
+      // Reset envelope
+      envelopeBox.classList.remove('envelope-opened');
+      envelopeBox.classList.add('envelope-float');
+
+      // Hide header & show intro
+      readingHeader.classList.add('opacity-0', 'pointer-events-none');
+      letterScreen.classList.add('hidden');
+
+      introScreen.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        introScreen.style.opacity = '1';
+        introScreen.style.transform = 'translateY(0) scale(1)';
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Event Listeners
+    openLetterBtn.addEventListener('click', openEnvelopeExperience);
+    envelopeBox.addEventListener('click', openEnvelopeExperience);
+    envelopeBox.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openEnvelopeExperience(e);
+      }
+    });
+
+    nextParagraphBtn.addEventListener('click', () => {
+      revealNextParagraph();
+    });
+
+    hugBtn.addEventListener('click', (e) => {
+      hugCount++;
+      playGentleChime('hug');
+
+      const rect = hugBtn.getBoundingClientRect();
+      const x = e.clientX || rect.left + rect.width / 2;
+      const y = e.clientY || rect.top;
+      triggerParticleBurst(x, y, 28);
+
+      hugCounterMsg.textContent = hugCount === 1
+        ? 'Poslat je topli zagrljaj za Anu! 🫂🎀🩷'
+        : `Poslati zagrljaji za Anu: ${hugCount} 🫂🎀🩷`;
+      hugCounterMsg.classList.remove('opacity-0');
+    });
+
+    replayBtn.addEventListener('click', resetExperience);
+
+    soundToggle.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundIcon.textContent = soundEnabled ? '🔔' : '🔕';
+      if (soundEnabled) {
+        playGentleChime('step');
+      }
+    });
+
+    // Initialize ambient background particles on load
+    window.addEventListener('DOMContentLoaded', createAmbientParticles);
+  </script>
+</body>
+</html>
